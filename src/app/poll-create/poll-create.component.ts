@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PollForm } from '../types';
 @Component({
   selector: 'app-poll-create',
   templateUrl: './poll-create.component.html',
@@ -8,18 +9,30 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class PollCreateComponent implements OnInit {
   pollForm: FormGroup;
 
+  @Output() pollCreated: EventEmitter<PollForm> = new EventEmitter();
+
   constructor(private fb: FormBuilder) {
     this.pollForm = this.fb.group({
       question: this.fb.control('', [Validators.required]),
       image: this.fb.control(''),
       opt1: this.fb.control(''),
       opt2: this.fb.control(''),
-      opt3: this.fb.control('')
-    })
+      opt3: this.fb.control(''),
+    });
   }
 
   submitForm() {
-    console.log(this.pollForm.value);
+    const formData: PollForm = {
+      question: this.pollForm.get('question')?.value,
+      thumbnail: this.pollForm.get('image')?.value,
+      options: [
+        this.pollForm.get('opt1')?.value,
+        this.pollForm.get('opt2')?.value,
+        this.pollForm.get('opt3')?.value,
+      ]
+    };
+
+    this.pollCreated.emit(formData);
   }
   ngOnInit(): void {}
 }
